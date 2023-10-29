@@ -1,0 +1,1 @@
+# grupowa_sztuczna_inteligencja_collab
