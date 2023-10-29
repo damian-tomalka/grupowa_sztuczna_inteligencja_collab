@@ -25,19 +25,23 @@ public class ServiceAgent extends Agent {
 		ServiceDescription sd3 = new ServiceDescription();
 		sd3.setType("answers");
 		sd3.setName("bouvier");
+
+		ServiceDescription sd4 = new ServiceDescription();
+		sd1.setType("answers");
+		sd1.setName("gcide");
+
 		//add them all
 		dfad.addServices(sd1);
 		dfad.addServices(sd2);
 		dfad.addServices(sd3);
+		dfad.addServices(sd4);
 		try {
 			DFService.register(this,dfad);
 		} catch (FIPAException ex) {
 			ex.printStackTrace();
 		}
-		
-		addBehaviour(new WordnetCyclicBehaviour(this));
+
 		addBehaviour(new DictionaryCyclicBehaviour(this));
-		addBehaviour(new BouvierCyclicBehaviour(this));
 		//doDelete();
 	}
 	protected void takeDown() {
