@@ -6,8 +6,6 @@ import jade.lang.acl.*;
 import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
 
 public class MyAgent extends Agent {
 	protected void setup () {
