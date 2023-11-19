@@ -7,7 +7,7 @@ import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import java.net.*;
 import java.io.*;
-
+/*
 public class CustomService extends Agent {
 	protected void setup () {
 		//services registration at DF
@@ -111,4 +111,4 @@ class GcideCyclicBehaviour extends CyclicBehaviour
 		}
 	}
 }
-
+*/

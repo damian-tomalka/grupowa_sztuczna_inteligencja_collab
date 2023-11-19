@@ -7,6 +7,7 @@ import jade.domain.*;
 import jade.domain.FIPAAgentManagement.*;
 import java.net.*;
 import java.io.*;
+import javax.swing.*;
 
 public class ServiceAgent extends Agent {
 	protected void setup () {
@@ -16,11 +17,11 @@ public class ServiceAgent extends Agent {
 		//service no 1
 		ServiceDescription sd1 = new ServiceDescription();
 		sd1.setType("answers");
-		sd1.setName("wordnet");
+		sd1.setName("wn");
 		//service no 2
 		ServiceDescription sd2 = new ServiceDescription();
 		sd2.setType("answers");
-		sd2.setName("dictionary");
+		sd2.setName("english");
 
 		ServiceDescription sd3 = new ServiceDescription();
 		sd3.setType("answers");
@@ -41,7 +42,7 @@ public class ServiceAgent extends Agent {
 			ex.printStackTrace();
 		}
 
-		addBehaviour(new DictionaryCyclicBehaviour(this));
+		addBehaviour(new CombinedCyclicBehaviour(this));
 		//doDelete();
 	}
 	protected void takeDown() {
@@ -91,110 +92,45 @@ public class ServiceAgent extends Agent {
 	}
 }
 
-class WordnetCyclicBehaviour extends CyclicBehaviour
+class CombinedCyclicBehaviour extends CyclicBehaviour
 {
 	ServiceAgent agent;
-	public WordnetCyclicBehaviour(ServiceAgent agent)
+	public CombinedCyclicBehaviour(ServiceAgent agent)
 	{
 		this.agent = agent;
 	}
 	public void action()
 	{
-		MessageTemplate template = MessageTemplate.MatchOntology("wordnet");
-		ACLMessage message = agent.receive(template);
-		if (message == null)
-		{
-			block();
-		}
-		else
-		{
-			//process the incoming message
-			String content = message.getContent();
-			ACLMessage reply = message.createReply();
-			reply.setPerformative(ACLMessage.INFORM);
-			String response = "";
-			try
+		String[] ontologies = {"wn", "english", "bouvier", "gcide"};
+		for(String ontology : ontologies ){
+			JOptionPane.showMessageDialog(null,"Checking " + ontology,"Message",JOptionPane.PLAIN_MESSAGE);
+			MessageTemplate template = MessageTemplate.MatchOntology(ontology);
+			ACLMessage message = agent.receive(template);
+			if (message == null)
 			{
-				response = agent.makeRequest("wn",content);
+				continue;
 			}
-			catch (NumberFormatException ex)
+			else
 			{
-				response = ex.getMessage();
+				//process the incoming message
+				String content = message.getContent();
+				ACLMessage reply = message.createReply();
+				reply.setPerformative(ACLMessage.INFORM);
+				String response = "";
+				try
+				{
+					response = agent.makeRequest(ontology, content);
+				}
+				catch (NumberFormatException ex)
+				{
+					response = ex.getMessage();
+				}
+				reply.setContent(response);
+				agent.send(reply);
+				return;
 			}
-			reply.setContent(response);
-			agent.send(reply);
 		}
-	}
-}
+		block();
 
-class DictionaryCyclicBehaviour extends CyclicBehaviour
-{
-	ServiceAgent agent;
-	public DictionaryCyclicBehaviour(ServiceAgent agent)
-	{
-		this.agent = agent;
-	}
-	public void action()
-	{
-		MessageTemplate template = MessageTemplate.MatchOntology("dictionary");
-		ACLMessage message = agent.receive(template);
-		if (message == null)
-		{
-			block();
-		}
-		else
-		{
-			//process the incoming message
-			String content = message.getContent();
-			ACLMessage reply = message.createReply();
-			reply.setPerformative(ACLMessage.INFORM);
-			String response = "";
-			try
-			{
-				response = agent.makeRequest("english", content);
-			}
-			catch (NumberFormatException ex)
-			{
-				response = ex.getMessage();
-			}
-			reply.setContent(response);
-			agent.send(reply);
-		}
-	}
-}
-
-class BouvierCyclicBehaviour extends CyclicBehaviour
-{
-	ServiceAgent agent;
-	public BouvierCyclicBehaviour(ServiceAgent agent)
-	{
-		this.agent = agent;
-	}
-	public void action()
-	{
-		MessageTemplate template = MessageTemplate.MatchOntology("bouvier");
-		ACLMessage message = agent.receive(template);
-		if (message == null)
-		{
-			block();
-		}
-		else
-		{
-			//process the incoming message
-			String content = message.getContent();
-			ACLMessage reply = message.createReply();
-			reply.setPerformative(ACLMessage.INFORM);
-			String response = "";
-			try
-			{
-				response = agent.makeRequest("bouvier", content);
-			}
-			catch (NumberFormatException ex)
-			{
-				response = ex.getMessage();
-			}
-			reply.setContent(response);
-			agent.send(reply);
-		}
 	}
 }
